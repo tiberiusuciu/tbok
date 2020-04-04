@@ -7,4 +7,6 @@ const router = express.Router();
 
 router.post('/', pokController.createPok);
 
+router.get('/:pokId', pokController.getPok);
+
 module.exports = router;

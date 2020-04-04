@@ -18,3 +18,21 @@ exports.createPok = async (req, res, next) => {
         next(err);
     }
 }
+
+exports.getPok = async (req, res, next) => {
+    const pokId = req.params.pokId;
+    try {
+        const pok = await Pok.findById(pokId);
+        if (!pok) {
+            const error = new Error('Could not find pok');
+            error.statusCode = 404;
+            throw error;
+        }
+        res.status(200).json({pok});
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+}
