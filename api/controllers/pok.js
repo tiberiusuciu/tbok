@@ -46,3 +46,13 @@ exports.getPoks = async (req, res, next) => {
         errorHandler(err, next);
     }
 }
+
+exports.deletePok = async (req, res, next) => {
+    const pokId = req.params.pokId;
+    try {
+        await Pok.deleteOne({ _id: pokId })
+        res.status(200).json({});
+    } catch (err) {
+        errorHandler(err, next);
+    }
+}

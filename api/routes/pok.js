@@ -5,10 +5,12 @@ const pokController = require('../controllers/pok');
 
 const router = express.Router();
 
-router.post('/', pokController.createPok);
+router.get('/', pokController.getPoks);
 
 router.get('/:pokId', pokController.getPok);
 
-router.get('/', pokController.getPoks);
+router.post('/', pokController.createPok);
+
+router.delete('/:pokId', pokController.deletePok);
 
 module.exports = router;
