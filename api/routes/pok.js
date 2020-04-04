@@ -9,6 +9,8 @@ router.get('/', pokController.getPoks);
 
 router.get('/:pokId', pokController.getPok);
 
+router.put('/:pokId', pokController.putPok);
+
 router.post('/', pokController.createPok);
 
 router.delete('/:pokId', pokController.deletePok);

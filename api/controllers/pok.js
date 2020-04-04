@@ -56,3 +56,18 @@ exports.deletePok = async (req, res, next) => {
         errorHandler(err, next);
     }
 }
+
+exports.putPok = async (req, res, next) => {
+    const pokId = req.params.pokId;
+    const { title, isPrivate, content } = req.body;
+    try {
+        const pok = await Pok.findById(pokId);
+        pok.title = title;
+        pok.isPrivate = isPrivate;
+        pok.content = content;
+        await pok.save();
+        res.status(200).json({pok});
+    } catch (err) {
+        errorHandler(err, next);
+    }
+}
