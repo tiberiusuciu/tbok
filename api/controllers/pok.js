@@ -1,5 +1,12 @@
 const Pok = require('../models/pok');
 
+const errorHandler = (err, next) => {
+    if (!err.statusCode) {
+        err.statusCode = 500;
+    }
+    next(err);
+}
+
 exports.createPok = async (req, res, next) => {
     const { title, isPrivate, content } = req.body;
     const pok = new Pok({title, content, isPrivate});
@@ -12,10 +19,7 @@ exports.createPok = async (req, res, next) => {
             pok
         });
     } catch (err) {
-        if (!err.statusCode) {
-            err.statusCode = 500;
-        }
-        next(err);
+        errorHandler(err, next);
     }
 }
 
@@ -30,10 +34,7 @@ exports.getPok = async (req, res, next) => {
         }
         res.status(200).json({pok});
     } catch (err) {
-        if (!err.statusCode) {
-            err.statusCode = 500;
-        }
-        next(err);
+        errorHandler(err, next);
     }
 }
 
@@ -42,9 +43,6 @@ exports.getPoks = async (req, res, next) => {
         const poks = await Pok.find({});
         res.status(200).json({poks});
     } catch (err) {
-        if (!err.statusCode) {
-            err.statusCode = 500;
-        }
-        next(err);
+        errorHandler(err, next);
     }
 }
