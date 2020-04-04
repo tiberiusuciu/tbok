@@ -36,3 +36,15 @@ exports.getPok = async (req, res, next) => {
         next(err);
     }
 }
+
+exports.getPoks = async (req, res, next) => {
+    try {
+        const poks = await Pok.find({});
+        res.status(200).json({poks});
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    }
+}

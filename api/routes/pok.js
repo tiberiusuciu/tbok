@@ -9,4 +9,6 @@ router.post('/', pokController.createPok);
 
 router.get('/:pokId', pokController.getPok);
 
+router.get('/', pokController.getPoks);
+
 module.exports = router;
