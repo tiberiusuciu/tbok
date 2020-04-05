@@ -39,8 +39,22 @@ exports.getPok = async (req, res, next) => {
 }
 
 exports.getPoks = async (req, res, next) => {
+    // for now filter is text only, but we should probably have a dedicated search by tag/title
+    const filter = req.body.filter;
     try {
-        const poks = await Pok.find({});
+        let poks;
+        if (filter) {
+            poks = await Pok.find({
+                "$or": [ 
+                    { "title": { "$regex": filter, "$options": 'i' } }, 
+                    { "content.data": { "$regex": filter, "$options": 'i' } },
+                    { "tags": { "$regex": filter, "$options": 'i' }}
+                ]
+            });
+        }
+        else {
+            poks = await Pok.find({});
+        }
         res.status(200).json({poks});
     } catch (err) {
         errorHandler(err, next);
