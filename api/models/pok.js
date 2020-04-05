@@ -22,7 +22,23 @@ const pokSchema = new Schema({
     isPrivate: {
         type: Boolean,
         default: false
-    }
+    },
+    isDraft: Boolean,
+    tags: [
+        {
+            type: String
+        }
+    ],
+    parentPok: {
+        type: Schema.Types.ObjectId,
+        ref: 'Pok'
+    },
+    childrenPok: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Pok'
+        }
+    ]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Pok', pokSchema);

@@ -8,8 +8,8 @@ const errorHandler = (err, next) => {
 }
 
 exports.createPok = async (req, res, next) => {
-    const { title, isPrivate, content } = req.body;
-    const pok = new Pok({title, content, isPrivate});
+    const { title, isPrivate, content, isDraft, tags, parentPok, childrenPok } = req.body;
+    const pok = new Pok({title, content, isPrivate, isDraft, tags, parentPok, childrenPok});
 
     try {
         await pok.save();
@@ -59,12 +59,34 @@ exports.deletePok = async (req, res, next) => {
 
 exports.putPok = async (req, res, next) => {
     const pokId = req.params.pokId;
-    const { title, isPrivate, content } = req.body;
+    const { title, isPrivate, content, isDraft, tags, parentPokId, childrenPok } = req.body;
     try {
+        // TODO: make sure not to have circular dependencies
         const pok = await Pok.findById(pokId);
-        pok.title = title;
-        pok.isPrivate = isPrivate;
-        pok.content = content;
+        if (title) pok.title = title;
+        if (isPrivate) pok.isPrivate = isPrivate;
+        if (content) pok.content = content;
+        if (isDraft) pok.isDraft = isDraft;
+        if (tags) pok.tags = tags;
+        if (parentPokId) {
+            const parentPok = await Pok.findById(parentPokId);
+            parentPok.childrenPok.push(pok);
+            await parentPok.save();
+            pok.parentPok = parentPok;
+        }
+        if (childrenPok) {
+            childrenPok.forEach(childPokId => {
+                Pok.findById(childPokId).then(childPok => {
+                    childPok.parentPok = pok;
+                    return childPok.save();
+                }).then(result => {
+                    return;
+                }).catch(err => {
+                    errorHandler(err, next);
+                })
+            });
+            pok.childrenPok = childrenPok;
+        }
         await pok.save();
         res.status(200).json({pok});
     } catch (err) {
