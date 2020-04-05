@@ -108,11 +108,22 @@ exports.addChildPok = async (req, res, next) => {
                 throw error;
             }
         })
+
         // make sure target child pok is not already parent pok of current pok
         if (pok.parentPok && pok.parentPok.toString() === childPokId) {
-            const error = new Error('Child is already parent!');
-            error.statusCode = 500;
-            throw error;
+            const parentPok = await Pok.findById(pok.parentPok);
+            if (!parentPok) {
+                const error = new Error('Parent pok does not exist!');
+                error.statusCode = 500;
+                throw error;
+            }
+
+            parentPok.childrenPok.filter(childPok => {
+                return childPok.toString() !== pok._id.toString()
+            })
+
+            pok.parentPok = undefined;
+            await parentPok.save();
         }
 
         pok.childrenPok.push(childPokId);
@@ -130,6 +141,25 @@ exports.addChildPok = async (req, res, next) => {
         await childPok.save();
         await pok.save();
         res.status(200).json({pok});
+    } catch (err) {
+        errorHandler(err, next);
+    }
+}
+
+exports.addParentPok = async (req, res, next) => {
+    const parentPokId = req.params.parentPokId;
+    const pokId = req.params.pokId;
+
+    try {
+        const pok = await Pok.findById(pokId);
+
+        if (!pok) {
+            const error = new Error('Pok does not exist!');
+            error.statusCode = 500;
+            throw error;
+        }
+
+
     } catch (err) {
         errorHandler(err, next);
     }

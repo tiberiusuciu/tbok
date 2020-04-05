@@ -13,6 +13,8 @@ router.put('/:pokId', pokController.putPok);
 
 router.put('/:pokId/add-child/:childPokId', pokController.addChildPok);
 
+router.put('/:pokId/add-parent/:parentPokId', pokController.addParentPok);
+
 router.post('/', pokController.createPok);
 
 router.delete('/:pokId', pokController.deletePok);
