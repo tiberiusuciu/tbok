@@ -7,6 +7,16 @@ const errorHandler = (err, next) => {
     next(err);
 }
 
+const getPokUtil = async (pokId) => {
+    const pok = await Pok.findById(pokId);
+    if (!pok) {
+        const error = new Error('Could not find pok');
+        error.statusCode = 404;
+        throw error;
+    }
+    return pok;
+}
+
 exports.createPok = async (req, res, next) => {
     const { title, isPrivate, content, isDraft, tags, parentPok, childrenPok } = req.body;
     const pok = new Pok({title, content, isPrivate, isDraft, tags, parentPok, childrenPok});
@@ -25,12 +35,7 @@ exports.createPok = async (req, res, next) => {
 exports.getPok = async (req, res, next) => {
     const pokId = req.params.pokId;
     try {
-        const pok = await Pok.findById(pokId);
-        if (!pok) {
-            const error = new Error('Could not find pok');
-            error.statusCode = 404;
-            throw error;
-        }
+        const pok = await getPokUtil(pokId);
         res.status(200).json({pok});
     } catch (err) {
         errorHandler(err, next);
@@ -74,7 +79,8 @@ exports.putPok = async (req, res, next) => {
     const pokId = req.params.pokId;
     const { title, isPrivate, content, isDraft, tags } = req.body;
     try {
-        const pok = await Pok.findById(pokId);
+        const pok = await getPokUtil(pokId);
+
         if (title) pok.title = title;
         if (isPrivate) pok.isPrivate = isPrivate;
         if (content) pok.content = content;
@@ -92,13 +98,7 @@ exports.addChildPok = async (req, res, next) => {
     const pokId = req.params.pokId;
 
     try {
-        const pok = await Pok.findById(pokId);
-
-        if (!pok) {
-            const error = new Error('Pok does not exist!');
-            error.statusCode = 500;
-            throw error;
-        }
+        const pok = await getPokUtil(pokId);
 
         // make sure child does not exist already within pok
         pok.childrenPok.forEach(childPok => {
@@ -111,12 +111,7 @@ exports.addChildPok = async (req, res, next) => {
 
         // make sure target child pok is not already parent pok of current pok
         if (pok.parentPok && pok.parentPok.toString() === childPokId) {
-            const parentPok = await Pok.findById(pok.parentPok);
-            if (!parentPok) {
-                const error = new Error('Parent pok does not exist!');
-                error.statusCode = 500;
-                throw error;
-            }
+            const parentPok = await getPokUtil(pok.parentPok);
 
             parentPok.childrenPok.filter(childPok => {
                 return childPok.toString() !== pok._id.toString()
@@ -128,13 +123,7 @@ exports.addChildPok = async (req, res, next) => {
 
         pok.childrenPok.push(childPokId);
 
-        const childPok = await Pok.findById(childPokId);
-
-        if (!childPok) {
-            const error = new Error('Child pok does not exist!');
-            error.statusCode = 500;
-            throw error;
-        }
+        const childPok = await getPokUtil(childPokId);
 
         childPok.parentPok = pok;
 
@@ -151,13 +140,7 @@ exports.addParentPok = async (req, res, next) => {
     const pokId = req.params.pokId;
 
     try {
-        const pok = await Pok.findById(pokId);
-
-        if (!pok) {
-            const error = new Error('Pok does not exist!');
-            error.statusCode = 500;
-            throw error;
-        }
+        const pok = await getPokUtil(pokId);
 
 
     } catch (err) {
