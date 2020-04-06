@@ -1,21 +1,6 @@
 const Pok = require('../models/pok');
 
-const errorHandler = (err, next) => {
-    if (!err.statusCode) {
-        err.statusCode = 500;
-    }
-    next(err);
-}
-
-const getPokUtil = async (pokId) => {
-    const pok = await Pok.findById(pokId);
-    if (!pok) {
-        const error = new Error('Could not find pok');
-        error.statusCode = 404;
-        throw error;
-    }
-    return pok;
-}
+const pokUtils = require('../util/pok'); 
 
 exports.createPok = async (req, res, next) => {
     const { title, isPrivate, content, isDraft, tags, parentPok, childrenPok } = req.body;
@@ -28,17 +13,17 @@ exports.createPok = async (req, res, next) => {
             pok
         });
     } catch (err) {
-        errorHandler(err, next);
+        pokUtils.errorHandler(err, next);
     }
 }
 
 exports.getPok = async (req, res, next) => {
     const pokId = req.params.pokId;
     try {
-        const pok = await getPokUtil(pokId);
+        const pok = await pokUtils.getPokUtil(pokId);
         res.status(200).json({pok});
     } catch (err) {
-        errorHandler(err, next);
+        pokUtils.errorHandler(err, next);
     }
 }
 
@@ -61,17 +46,18 @@ exports.getPoks = async (req, res, next) => {
         }
         res.status(200).json({poks});
     } catch (err) {
-        errorHandler(err, next);
+        pokUtils.errorHandler(err, next);
     }
 }
 
 exports.deletePok = async (req, res, next) => {
     const pokId = req.params.pokId;
+    // remove parents and children
     try {
         await Pok.deleteOne({ _id: pokId })
         res.status(200).json({});
     } catch (err) {
-        errorHandler(err, next);
+        pokUtils.errorHandler(err, next);
     }
 }
 
@@ -79,7 +65,7 @@ exports.putPok = async (req, res, next) => {
     const pokId = req.params.pokId;
     const { title, isPrivate, content, isDraft, tags } = req.body;
     try {
-        const pok = await getPokUtil(pokId);
+        const pok = await pokUtils.getPokUtil(pokId);
 
         if (title) pok.title = title;
         if (isPrivate) pok.isPrivate = isPrivate;
@@ -89,7 +75,7 @@ exports.putPok = async (req, res, next) => {
         await pok.save();
         res.status(200).json({pok});
     } catch (err) {
-        errorHandler(err, next);
+        pokUtils.errorHandler(err, next);
     }
 }
 
@@ -98,7 +84,7 @@ exports.addChildPok = async (req, res, next) => {
     const pokId = req.params.pokId;
 
     try {
-        const pok = await getPokUtil(pokId);
+        const pok = await pokUtils.getPokUtil(pokId);
 
         // make sure child does not exist already within pok
         pok.childrenPok.forEach(childPok => {
@@ -111,7 +97,7 @@ exports.addChildPok = async (req, res, next) => {
 
         // make sure target child pok is not already parent pok of current pok
         if (pok.parentPok && pok.parentPok.toString() === childPokId) {
-            const parentPok = await getPokUtil(pok.parentPok);
+            const parentPok = await pokUtils.getPokUtil(pok.parentPok);
 
             parentPok.childrenPok.filter(childPok => {
                 return childPok.toString() !== pok._id.toString()
@@ -123,7 +109,7 @@ exports.addChildPok = async (req, res, next) => {
 
         pok.childrenPok.push(childPokId);
 
-        const childPok = await getPokUtil(childPokId);
+        const childPok = await pokUtils.getPokUtil(childPokId);
 
         childPok.parentPok = pok;
 
@@ -131,7 +117,7 @@ exports.addChildPok = async (req, res, next) => {
         await pok.save();
         res.status(200).json({pok});
     } catch (err) {
-        errorHandler(err, next);
+        pokUtils.errorHandler(err, next);
     }
 }
 
@@ -140,10 +126,18 @@ exports.addParentPok = async (req, res, next) => {
     const pokId = req.params.pokId;
 
     try {
-        const pok = await getPokUtil(pokId);
+        const pok = await pokUtils.getPokUtil(pokId);
+
+        // remove it from the children
+        // pok.childrenPok.forEach(childPokId => {
+        //     if (childPokId.toString() === parentPokId) {
+        //         const childPok = pokUtils.getPokUtil(childPokId);
+        //         childPok.parentPok
+        //     }
+        // })
 
 
     } catch (err) {
-        errorHandler(err, next);
+        pokUtils.errorHandler(err, next);
     }
 }
