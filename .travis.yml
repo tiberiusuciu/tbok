@@ -3,4 +3,4 @@ services: mongodb
 node_js:
  - lts/*
 
-script: cd .api/ && npm install && ./node_modules/.bin/mocha ./api
+script: cd ./api/ && npm install && ./node_modules/.bin/mocha ./api
