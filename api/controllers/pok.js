@@ -1,6 +1,6 @@
 const Pok = require('../models/pok');
 
-const pokUtils = require('../util/pok'); 
+const pokUtils = require('../utils/pok'); 
 
 exports.createPok = async (req, res, next) => {
     const { title, isPrivate, content, isDraft, tags, parentPok, childrenPok } = req.body;
