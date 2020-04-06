@@ -5,4 +5,3 @@ node_js:
 
 before_install:
   - cd ./api/
-# script: cd ./api/ && npm install && ./node_modules/.bin/mocha

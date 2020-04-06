@@ -16,7 +16,7 @@ describe('Pok Controller', function() {
             isPrivate: false,
             tags: ['test', 'another tag'],
             childrenPok: ['5e89420317a85010949d6d0a'],
-            title: 'Pok title',
+            title: 'Pok title one',
             content: [
                 {
                     nodeType: 'paragraph',
@@ -32,7 +32,7 @@ describe('Pok Controller', function() {
             isPrivate: false,
             tags: ['test', 'another tag'],
             childrenPok: [],
-            title: 'Pok title',
+            title: 'Pok title two',
             content: [
                 {
                     nodeType: 'paragraph',
@@ -47,7 +47,7 @@ describe('Pok Controller', function() {
             isPrivate: false,
             tags: ['test', 'another tag'],
             childrenPok: [],
-            title: 'Pok title',
+            title: 'Pok title three',
             content: [
                 {
                     nodeType: 'paragraph',
@@ -67,7 +67,7 @@ describe('Pok Controller', function() {
         await mongoose.disconnect();
     });
 
-    it('should add a new pok to the list of poks', async () => {
+    it('[createPok] should add a new pok to the list of poks', async () => {
         const req = {
             body: {
                 "title": "This is a brand new pok",
@@ -93,12 +93,35 @@ describe('Pok Controller', function() {
             json: function(data) {
               pok = data.pok;
             }
-          };
+        };
 
         await PokController.createPok(req, res, () => {});
         const count = await Pok.countDocuments({});
 
         expect(count).to.be.equal(4);
-        expect(pok.title).to.be.equal(req.body.title)
+        expect(pok.title).to.be.equal(req.body.title);
     })
+
+    it('[getPok] should return a specific pok', async () => {
+        const req = {
+            params: {
+                "pokId": "5e893daaa49747449c4ce9a5",
+            }
+        }
+
+        let pok;
+
+        const res = {
+            status: function(code) {
+              return this;
+            },
+            json: function(data) {
+              pok = data.pok;
+            }
+        };
+
+        await PokController.getPok(req, res, () => {});
+
+        expect(pok.title).to.be.equal('Pok title one');
+    });
 });
