@@ -67,6 +67,29 @@ describe('Pok Controller', function() {
         await mongoose.disconnect();
     });
 
+    it('[getPoks] should return all poks', async () => {
+        let poks;
+
+        const req = {
+            body: {
+
+            }
+        }
+
+        const res = {
+            status: function(code) {
+              return this;
+            },
+            json: function(data) {
+              poks = data.poks;
+            }
+        };
+
+        await PokController.getPoks(req, res, () => {});
+
+        expect(poks).to.have.length(3);
+    });
+
     it('[createPok] should add a new pok to the list of poks', async () => {
         const req = {
             body: {
