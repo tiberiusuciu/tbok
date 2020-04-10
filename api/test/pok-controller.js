@@ -30,7 +30,7 @@ describe('Pok Controller', function() {
 
         const pok2 = new Pok({
             isPrivate: false,
-            tags: ['test', 'another tag'],
+            tags: ['test', 'another tag', 'filter'],
             childrenPok: [],
             title: 'Pok title two',
             content: [
@@ -45,7 +45,7 @@ describe('Pok Controller', function() {
 
         const pok3 = new Pok({
             isPrivate: false,
-            tags: ['test', 'another tag'],
+            tags: ['test', 'another tag', 'filter'],
             childrenPok: [],
             title: 'Pok title three',
             content: [
@@ -88,6 +88,29 @@ describe('Pok Controller', function() {
         await PokController.getPoks(req, res, () => {});
 
         expect(poks).to.have.length(3);
+    });
+
+    it('[getPoks] should return a filtered lists of pok', async () => {
+        let poks;
+
+        const req = {
+            body: {
+                filter: "filter"
+            }
+        }
+
+        const res = {
+            status: function(code) {
+              return this;
+            },
+            json: function(data) {
+              poks = data.poks;
+            }
+        };
+
+        await PokController.getPoks(req, res, () => {});
+
+        expect(poks).to.have.length(2);
     });
 
     it('[createPok] should add a new pok to the list of poks', async () => {
