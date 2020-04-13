@@ -3,8 +3,7 @@ const Pok = require('../models/pok');
 const pokUtils = require('../utils/pok'); 
 
 exports.createPok = async (req, res, next) => {
-    const { title, isPrivate, content, isDraft, tags, parentPok, childrenPok } = req.body;
-    const pok = new Pok({title, content, isPrivate, isDraft, tags, parentPok, childrenPok});
+    const pok = new Pok(req.body);
 
     try {
         await pok.save();
