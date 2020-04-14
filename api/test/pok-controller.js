@@ -148,6 +148,32 @@ describe('Pok Controller', function() {
         expect(pok.title).to.be.equal(req.body.title);
     })
 
+    it('[deletePok] should remove a pok from the list of poks', async () => {
+        const req = {
+            params: {
+                pokId: "5e89420317a85010949d6d0a"
+            }
+        }
+
+
+        let pok;
+
+        const res = {
+            status: function(code) {
+              return this;
+            },
+            json: function(data) {
+              pok = data.pok;
+            }
+        };
+
+        await PokController.deletePok(req, res, () => {});
+        const count = await Pok.countDocuments({});
+
+        // try to fetch that ID
+        expect(count).to.be.equal(3);
+    })
+
     it('[getPok] should return a specific pok', async () => {
         const req = {
             params: {
