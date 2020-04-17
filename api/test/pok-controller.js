@@ -155,9 +155,6 @@ describe('Pok Controller', function() {
             }
         }
 
-
-        let pok;
-
         const res = {
             status: function(code) {
               return this;
