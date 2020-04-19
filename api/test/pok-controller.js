@@ -193,4 +193,31 @@ describe('Pok Controller', function() {
 
         expect(pok.title).to.be.equal('Pok title one');
     });
+
+    it('[putPok] should update a specific pok', async () => {
+        const req = {
+            params: {
+                "pokId": "5e893daaa49747449c4ce9a5",
+            },
+            body: {
+                tags: ['isUpdated']
+            }
+        }
+
+        let pok;
+
+        const res = {
+            status: function(code) {
+              return this;
+            },
+            json: function(data) {
+              pok = data.pok;
+            }
+        };
+
+        await PokController.putPok(req, res, () => {});
+
+        expect(pok.tags).to.have.length(1);
+        expect(pok.tags[0]).to.be.equal('isUpdated');
+    });
 });
